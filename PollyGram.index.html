@@ -900,4 +900,31 @@
 
     window.openSettings = () => document.getElementById('settings-modal').classList.remove('hidden');
     
-    window.saveProfile = async () => 
+    window.saveProfile = async () => {
+        const newBio = document.getElementById('edit-bio').value;
+        const file = document.getElementById('edit-pfp-file').files[0];
+        
+        let photoURL = currentUser.photoURL;
+        
+        if(file) {
+            const storageRef = ref(storage, `profiles/${currentUser.uid}`);
+            await uploadBytes(storageRef, file);
+            photoURL = await getDownloadURL(storageRef);
+        }
+        
+        // Update Auth
+        await updateProfile(currentUser, { photoURL: photoURL });
+        
+        // Update Firestore
+        const dataToUpdate = { photoURL: photoURL };
+        if(newBio) dataToUpdate.bio = newBio;
+        
+        await updateDoc(doc(db, "users", currentUser.uid), dataToUpdate);
+        
+        closeModal('settings-modal');
+        alert("Profile Updated!");
+    };
+
+</script>
+</body>
+</html>
