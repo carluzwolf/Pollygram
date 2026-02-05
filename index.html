@@ -411,4 +411,10 @@
     }
 
     // --- UI HELPERS ---
-    windo
+    window.openModal = (id) => document.getElementById(id).classList.remove('hidden');
+    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
+    window.closeOverlay = (id) => document.getElementById(id).classList.remove('active');
+
+</script>
+</body>
+</html>
