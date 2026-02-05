@@ -5,161 +5,229 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Pollygram Pro</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
-            --primary: #2563eb; --primary-dark: #1d4ed8;
-            --bg: #f8fafc; --surface: #ffffff;
-            --text: #0f172a; --text-light: #64748b;
-            --border: #e2e8f0; --accent: #eff6ff;
+            --primary: #3b82f6;
+            --bg: #0f172a;
+            --surface: #1e293b;
+            --text: #f8fafc;
+            --text-dim: #94a3b8;
+            --border: #334155;
+            --accent: #2563eb;
         }
-        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        body { margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; justify-content: center; height: 100vh; }
-        
-        #app-container { width: 100%; max-width: 500px; background: var(--surface); display: flex; flex-direction: column; position: relative; box-shadow: 0 0 40px rgba(0,0,0,0.05); }
-        .hidden { display: none !important; }
 
-        /* Auth */
-        .auth-screen { position: absolute; inset: 0; background: var(--surface); z-index: 2000; padding: 40px; display: flex; flex-direction: column; justify-content: center; }
-        .auth-input { width: 100%; padding: 14px; margin-bottom: 12px; border: 1px solid var(--border); border-radius: 8px; font-size: 1rem; }
-        .btn-main { background: var(--primary); color: white; padding: 14px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; width: 100%; }
-
-        /* Header & Nav */
-        header { padding: 0 20px; height: 60px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); background: white; }
-        header h1 { font-size: 1.25rem; font-weight: 800; color: var(--primary); margin: 0; }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; }
         
-        .main-content { flex: 1; overflow-y: auto; background: var(--bg); }
-        nav { height: 65px; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid var(--border); background: white; }
-        .nav-item { color: var(--text-light); font-size: 1.2rem; cursor: pointer; transition: 0.2s; padding: 10px; }
+        body, html { 
+            margin: 0; padding: 0; width: 100%; height: 100%; 
+            font-family: 'Plus Jakarta Sans', sans-serif; 
+            background: #000; color: var(--text);
+            overflow: hidden; /* Impede o scroll da página inteira */
+        }
+
+        /* Container Principal: Simula o limite de um celular */
+        #app-container {
+            width: 100%; max-width: 450px; height: 100%;
+            margin: 0 auto; background: var(--bg);
+            display: flex; flex-direction: column;
+            position: relative;
+        }
+
+        /* --- AUTH SCREEN --- */
+        .auth-screen {
+            position: absolute; inset: 0; background: var(--bg);
+            z-index: 2000; padding: 40px 20px;
+            display: flex; flex-direction: column; justify-content: center;
+        }
+        .logo { font-size: 2.5rem; font-weight: 800; text-align: center; margin-bottom: 40px; color: var(--primary); letter-spacing: -1px; }
+        .auth-input { 
+            width: 100%; background: var(--surface); border: 1px solid var(--border);
+            padding: 16px; border-radius: 12px; color: white; margin-bottom: 12px; font-size: 1rem;
+        }
+        .btn-prime {
+            width: 100%; background: var(--primary); color: white; border: none;
+            padding: 16px; border-radius: 12px; font-weight: 700; cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-prime:active { transform: scale(0.98); opacity: 0.9; }
+
+        /* --- HEADER --- */
+        header {
+            height: 60px; padding: 0 20px; display: flex; align-items: center; justify-content: space-between;
+            border-bottom: 1px solid var(--border); background: var(--bg);
+        }
+        header h1 { font-size: 1.2rem; font-weight: 800; margin: 0; color: var(--primary); }
+
+        /* --- ÁREA DE CONTEÚDO (SCROLLABLE) --- */
+        .main-content {
+            flex: 1; overflow-y: auto; overflow-x: hidden;
+            padding-bottom: 20px;
+        }
+
+        /* --- NAVBAR --- */
+        nav {
+            height: 70px; display: flex; justify-content: space-around; align-items: center;
+            background: var(--surface); border-top: 1px solid var(--border);
+            padding-bottom: env(safe-area-inset-bottom);
+        }
+        .nav-item { color: var(--text-dim); font-size: 1.4rem; cursor: pointer; transition: 0.3s; position: relative; padding: 10px; }
         .nav-item.active { color: var(--primary); }
 
-        /* Cards e Listas */
-        .post-card { background: white; margin: 10px; padding: 15px; border-radius: 12px; border: 1px solid var(--border); }
-        .post-header { display: flex; align-items: center; margin-bottom: 10px; font-weight: 600; font-size: 0.9rem; }
-        .user-avatar-text { width: 35px; height: 35px; background: var(--accent); color: var(--primary); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 10px; font-weight: bold; }
-        .post-content { line-height: 1.5; color: var(--text); }
+        /* --- COMPONENTES --- */
+        .post-card { background: var(--surface); margin: 12px; padding: 16px; border-radius: 16px; border: 1px solid var(--border); }
+        .user-row { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+        .avatar-txt { width: 40px; height: 40px; border-radius: 12px; background: var(--primary); display: flex; align-items: center; justify-content: center; font-weight: 800; color: white; }
+        .post-body { line-height: 1.5; font-size: 0.95rem; color: #cbd5e1; }
 
-        .list-item { display: flex; align-items: center; padding: 15px 20px; background: white; border-bottom: 1px solid var(--border); cursor: pointer; }
-        .list-item:hover { background: var(--accent); }
-        
-        /* Modais e Overlays */
-        .overlay { position: absolute; inset: 0; background: var(--bg); z-index: 1000; display: flex; flex-direction: column; transform: translateX(100%); transition: 0.3s; }
+        .notes-scroll { display: flex; gap: 15px; padding: 15px; overflow-x: auto; scrollbar-width: none; border-bottom: 1px solid var(--border); }
+        .notes-scroll::-webkit-scrollbar { display: none; }
+        .note-circle { min-width: 65px; text-align: center; }
+        .note-bubble { 
+            background: var(--surface); border: 1px solid var(--primary); 
+            padding: 6px; border-radius: 10px; font-size: 0.7rem; margin-bottom: 6px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .list-item { 
+            padding: 16px 20px; display: flex; align-items: center; gap: 15px;
+            border-bottom: 1px solid var(--border); cursor: pointer;
+        }
+        .list-item:active { background: var(--surface); }
+
+        /* --- OVERLAYS (Telas que deslizam) --- */
+        .overlay {
+            position: absolute; inset: 0; background: var(--bg); z-index: 1000;
+            display: flex; flex-direction: column; transform: translateX(100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
         .overlay.active { transform: translateX(0); }
-        .overlay-header { padding: 15px; background: white; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 15px; }
-        
-        .fab { position: absolute; bottom: 85px; right: 20px; width: 56px; height: 56px; border-radius: 50%; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.4); cursor: pointer; }
-        
-        .notes-bar { display: flex; overflow-x: auto; padding: 15px; gap: 15px; background: white; border-bottom: 1px solid var(--border); }
-        .note-item { min-width: 80px; text-align: center; font-size: 0.75rem; }
-        .note-text-bubble { background: var(--accent); padding: 8px; border-radius: 10px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; border: 1px solid #dbeafe; }
+        .overlay-head { height: 60px; padding: 0 20px; display: flex; align-items: center; gap: 20px; border-bottom: 1px solid var(--border); }
+
+        /* --- CHAT --- */
+        #chat-msgs { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+        .msg { padding: 12px 16px; border-radius: 18px; max-width: 80%; font-size: 0.9rem; line-height: 1.4; }
+        .sent { align-self: flex-end; background: var(--primary); color: white; border-bottom-right-radius: 4px; }
+        .received { align-self: flex-start; background: var(--surface); border-bottom-left-radius: 4px; }
+
+        .chat-input-area { padding: 15px; background: var(--surface); display: flex; gap: 10px; }
+
+        /* --- FAB --- */
+        .fab {
+            position: absolute; bottom: 90px; right: 20px;
+            width: 56px; height: 56px; border-radius: 18px;
+            background: var(--primary); color: white;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.5rem; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.4);
+            cursor: pointer; z-index: 99;
+        }
+
+        /* --- MODAL --- */
+        .modal { 
+            position: fixed; inset: 0; background: rgba(0,0,0,0.8); 
+            z-index: 3000; display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .modal-box { background: var(--surface); width: 100%; max-width: 350px; padding: 24px; border-radius: 20px; border: 1px solid var(--border); }
+
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
+
 <div id="app-container">
-      <div id="auth-layer" class="auth-screen">
-        <h1 style="text-align:center; color:var(--primary); font-size:2rem; margin-bottom:30px;">Pollygram</h1>
+    
+    <div id="auth-layer" class="auth-screen">
+        <div class="logo">Pollygram</div>
         <div id="login-form">
-            <input type="text" id="login-user" class="auth-input" placeholder="Username">
-            <input type="password" id="login-pass" class="auth-input" placeholder="Senha">
-            <button class="btn-main" onclick="handleLogin()">Entrar</button>
-            <p style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--text-light)" onclick="toggleAuth('signup')">Não tem conta? <span style="color:var(--primary)">Cadastre-se</span></p>
+            <input type="text" id="l-user" class="auth-input" placeholder="Seu Username">
+            <input type="password" id="l-pass" class="auth-input" placeholder="Sua Senha">
+            <button class="btn-prime" onclick="handleLogin()">Acessar Rede</button>
+            <p style="text-align:center; color:var(--text-dim); margin-top:20px;" onclick="toggleAuth('up')">Novo aqui? <span style="color:var(--primary)">Criar conta</span></p>
         </div>
         <div id="signup-form" class="hidden">
-            <input type="text" id="signup-user" class="auth-input" placeholder="Escolha um Username">
-            <input type="password" id="signup-pass" class="auth-input" placeholder="Senha">
-            <button class="btn-main" onclick="handleSignup()">Criar Conta Profissional</button>
-            <p style="text-align:center; margin-top:20px; font-size:0.9rem; color:var(--text-light)" onclick="toggleAuth('login')">Já tem conta? <span style="color:var(--primary)">Login</span></p>
+            <input type="text" id="s-user" class="auth-input" placeholder="Escolha um Username">
+            <input type="password" id="s-pass" class="auth-input" placeholder="Crie uma Senha">
+            <button class="btn-prime" onclick="handleSignup()">Finalizar Cadastro</button>
+            <p style="text-align:center; color:var(--text-dim); margin-top:20px;" onclick="toggleAuth('in')">Já tem conta? <span style="color:var(--primary)">Login</span></p>
         </div>
     </div>
 
     <div id="main-app" class="hidden" style="height:100%; display:flex; flex-direction:column;">
         <header>
-            <h1 id="view-title">Feed</h1>
-            <i class="fas fa-bell" style="color:var(--text-light)"></i>
+            <h1 id="header-title">Feed</h1>
+            <i class="fas fa-search" style="color:var(--text-dim)"></i>
         </header>
 
         <div class="main-content">
-            <div id="tab-feed" class="tab-pane">
-                <div class="notes-bar" id="notes-container">
-                    <div class="note-item" onclick="openNoteModal()">
-                        <div class="note-text-bubble" style="background:#eee;">+ Nota</div>
-                        <span>Você</span>
+            <div id="tab-feed" class="tab-content">
+                <div class="notes-scroll" id="notes-list">
+                    <div class="note-circle" onclick="openModal('note-modal')">
+                        <div class="note-bubble" style="background:var(--border)">+ Nota</div>
+                        <span style="font-size:0.7rem">Você</span>
                     </div>
                 </div>
-                <div id="feed-list"></div>
-                <div class="fab" onclick="openPostModal()"><i class="fas fa-pen"></i></div>
+                <div id="feed-items"></div>
+                <div class="fab" onclick="openModal('post-modal')"><i class="fas fa-plus"></i></div>
             </div>
 
-            <div id="tab-users" class="tab-pane hidden">
-                <div style="padding:15px; font-size:0.8rem; color:var(--text-light); font-weight:bold;">MEMBROS DA REDE</div>
-                <div id="global-users-list"></div>
+            <div id="tab-discover" class="tab-content hidden">
+                <div id="users-list"></div>
             </div>
 
-            <div id="tab-chats" class="tab-pane hidden">
-                <div id="chat-inbox-list"></div>
+            <div id="tab-chats" class="tab-content hidden">
+                <div id="inbox-list"></div>
             </div>
 
-            <div id="tab-profile" class="tab-pane hidden">
-                <div style="background:white; padding:30px 20px; text-align:center; border-bottom:1px solid var(--border);">
-                    <div id="my-avatar-big" style="width:80px; height:80px; background:var(--accent); color:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 15px; font-size:2rem; font-weight:bold;">?</div>
-                    <h2 id="my-username-display" style="margin:0;"></h2>
-                    <p id="my-bio-display" style="color:var(--text-light); margin:10px 0; font-size:0.9rem;"></p>
-                    <button onclick="handleLogout()" style="background:none; border:1px solid #ff4444; color:#ff4444; padding:5px 15px; border-radius:5px; margin-top:10px; cursor:pointer;">Sair da Conta</button>
-                </div>
-                <div id="my-posts-list"></div>
+            <div id="tab-me" class="tab-content hidden" style="padding:20px; text-align:center;">
+                <div id="my-avatar" class="avatar-txt" style="width:80px; height:80px; font-size:2rem; margin:0 auto 15px;">?</div>
+                <h2 id="my-name" style="margin:0;"></h2>
+                <p id="my-bio" style="color:var(--text-dim); margin-bottom:20px;">Membro do Pollygram Pro</p>
+                <button class="btn-prime" style="background:rgba(239,68,68,0.1); color:#ef4444; border:1px solid #ef4444;" onclick="handleLogout()">Sair</button>
             </div>
         </div>
 
         <nav>
-            <div class="nav-item active" onclick="switchTab('feed', this)"><i class="fas fa-list-alt"></i></div>
-            <div class="nav-item" onclick="switchTab('users', this)"><i class="fas fa-users"></i></div>
-            <div class="nav-item" onclick="switchTab('chats', this)"><i class="fas fa-comment-dots"></i></div>
-            <div class="nav-item" onclick="switchTab('profile', this)"><i class="fas fa-user-circle"></i></div>
+            <div class="nav-item active" onclick="switchTab('feed', this)"><i class="fas fa-home-alt"></i></div>
+            <div class="nav-item" onclick="switchTab('discover', this)"><i class="fas fa-compass"></i></div>
+            <div class="nav-item" onclick="switchTab('chats', this)"><i class="fas fa-comment-alt-lines"></i></div>
+            <div class="nav-item" onclick="switchTab('me', this)"><i class="fas fa-user"></i></div>
         </nav>
     </div>
-      <div id="chat-window" class="overlay">
-        <div class="overlay-header">
-            <i class="fas fa-arrow-left" onclick="closeOverlay('chat-window')"></i>
-            <span id="chat-target-name" style="font-weight:bold;"></span>
-        </div>
-        <div id="chat-messages" style="flex:1; overflow-y:auto; padding:15px; display:flex; flex-direction:column; gap:10px;"></div>
-        <div style="padding:15px; background:white; display:flex; gap:10px; border-top:1px solid var(--border);">
-            <input type="text" id="chat-input" style="flex:1; padding:12px; border-radius:25px; border:1px solid var(--border);" placeholder="Escreva...">
-            <button onclick="sendChatMessage()" style="background:var(--primary); color:white; border:none; width:45px; height:45px; border-radius:50%;"><i class="fas fa-paper-plane"></i></button>
-        </div>
-    </div>
 
-    <div id="user-profile-view" class="overlay">
-        <div class="overlay-header">
-            <i class="fas fa-arrow-left" onclick="closeOverlay('user-profile-view')"></i>
-            <span>Perfil</span>
+    <div id="chat-overlay" class="overlay">
+        <div class="overlay-head">
+            <i class="fas fa-chevron-left" onclick="closeOverlay('chat-overlay')"></i>
+            <span id="chat-user-name" style="font-weight:700;">Chat</span>
         </div>
-        <div id="profile-view-content" style="text-align:center; padding:40px 20px;">
-            <div id="view-avatar" style="width:100px; height:100px; background:var(--accent); color:var(--primary); border-radius:50%; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:2.5rem; font-weight:bold;"></div>
-            <h2 id="view-username"></h2>
-            <p id="view-bio" style="color:var(--text-light);"></p>
-            <button id="start-chat-btn" class="btn-main" style="max-width:200px; margin-top:20px;">Enviar Mensagem</button>
+        <div id="chat-msgs"></div>
+        <div class="chat-input-area">
+            <input type="text" id="chat-in" class="auth-input" style="margin:0; border-radius:25px;" placeholder="Sua mensagem...">
+            <button onclick="sendMsg()" class="btn-prime" style="width:50px; height:50px; border-radius:50%; padding:0;"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
 
     <div id="post-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Novo Post em Texto</h3>
-            <textarea id="post-text" class="auth-input" style="height:120px; resize:none;" placeholder="No que você está pensando?"></textarea>
-            <button class="btn-main" onclick="submitPost()">Publicar</button>
-            <button onclick="closeModal('post-modal')" style="width:100%; margin-top:10px; border:none; background:none;">Cancelar</button>
+        <div class="modal-box">
+            <h3 style="margin-top:0">Novo Post</h3>
+            <textarea id="post-text" class="auth-input" style="height:120px; resize:none;" placeholder="No que está pensando?"></textarea>
+            <button class="btn-prime" onclick="savePost()">Publicar</button>
+            <button onclick="closeModal('post-modal')" style="width:100%; margin-top:10px; background:none; border:none; color:var(--text-dim);">Cancelar</button>
         </div>
     </div>
 
     <div id="note-modal" class="modal hidden">
-        <div class="modal-content">
-            <h3>Sua Nota</h3>
-            <input type="text" id="note-text" class="auth-input" maxlength="40" placeholder="Ex: Focado no trabalho...">
-            <button class="btn-main" onclick="submitNote()">Salvar Nota</button>
-            <button onclick="closeModal('note-modal')" style="width:100%; margin-top:10px; border:none; background:none;">Fechar</button>
+        <div class="modal-box">
+            <h3 style="margin-top:0">Nova Nota</h3>
+            <input type="text" id="note-text" class="auth-input" maxlength="40" placeholder="Ex: Focado hoje!">
+            <button class="btn-prime" onclick="saveNote()">Atualizar</button>
+            <button onclick="closeModal('note-modal')" style="width:100%; margin-top:10px; background:none; border:none; color:var(--text-dim);">Fechar</button>
         </div>
     </div>
-  <script type="module">
+
+</div>
+
+<script type="module">
+    // --- FIREBASE CONFIG ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut, updateProfile } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
     import { getFirestore, collection, addDoc, query, where, onSnapshot, orderBy, doc, setDoc, getDocs } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
@@ -180,27 +248,28 @@
     let currentUser = null;
     let activeChatId = null;
 
-    // --- AUTH ---
-    window.toggleAuth = (v) => {
-        document.getElementById('login-form').classList.toggle('hidden', v==='signup');
-        document.getElementById('signup-form').classList.toggle('hidden', v==='login');
+    // --- AUTH LOGIC ---
+    window.toggleAuth = (m) => {
+        document.getElementById('login-form').classList.toggle('hidden', m==='up');
+        document.getElementById('signup-form').classList.toggle('hidden', m==='in');
     };
 
     window.handleLogin = async () => {
-        const u = document.getElementById('login-user').value;
-        const p = document.getElementById('login-pass').value;
-        try { await signInWithEmailAndPassword(auth, `${u}@polly.pro`, p); } catch(e) { alert("Usuário ou senha inválidos."); }
+        const u = document.getElementById('l-user').value;
+        const p = document.getElementById('l-pass').value;
+        try { await signInWithEmailAndPassword(auth, `${u}@polly.pro`, p); } 
+        catch(e) { alert("Erro ao entrar. Verifique os dados."); }
     };
 
     window.handleSignup = async () => {
-        const u = document.getElementById('signup-user').value.trim();
-        const p = document.getElementById('signup-pass').value;
-        if(u.length < 3) return alert("Username curto demais.");
+        const u = document.getElementById('s-user').value.trim();
+        const p = document.getElementById('s-pass').value;
+        if(u.length < 3) return alert("Nome muito curto!");
         try {
             const res = await createUserWithEmailAndPassword(auth, `${u}@polly.pro`, p);
             await updateProfile(res.user, { displayName: u });
-            await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, username: u, bio: "Membro do Pollygram Pro", createdAt: Date.now() });
-        } catch(e) { alert(e.message); }
+            await setDoc(doc(db, "users", res.user.uid), { uid: res.user.uid, username: u, bio: "Status: Online", createdAt: Date.now() });
+        } catch(e) { alert("Erro: " + e.message); }
     };
 
     window.handleLogout = () => signOut(auth);
@@ -212,163 +281,134 @@
         if(user) initApp();
     });
 
-    // --- NAVEGAÇÃO ---
-    window.switchTab = (tab, el) => {
-        document.querySelectorAll('.tab-pane').forEach(p => p.classList.add('hidden'));
-        document.getElementById(`tab-${tab}`).classList.remove('hidden');
-        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-        el.classList.add('active');
-        document.getElementById('view-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
-    };
-
+    // --- APP CORE ---
     function initApp() {
-        // Carrega Perfil
-        document.getElementById('my-username-display').innerText = currentUser.displayName;
-        document.getElementById('my-avatar-big').innerText = currentUser.displayName[0].toUpperCase();
+        document.getElementById('my-name').innerText = currentUser.displayName;
+        document.getElementById('my-avatar').innerText = currentUser.displayName[0].toUpperCase();
         
         loadFeed();
         loadNotes();
-        loadAllUsers();
+        loadUsers();
         loadInbox();
     }
 
-    // --- FEED & POSTS ---
+    window.switchTab = (tab, el) => {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+        document.getElementById(`tab-${tab}`).classList.remove('hidden');
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+        document.getElementById('header-title').innerText = tab.charAt(0).toUpperCase() + tab.slice(1);
+    };
+
+    // --- FEED & NOTES ---
     function loadFeed() {
         onSnapshot(query(collection(db, "posts"), orderBy("timestamp", "desc")), (snap) => {
-            const list = document.getElementById('feed-list');
+            const list = document.getElementById('feed-items');
             list.innerHTML = "";
             snap.forEach(d => {
                 const p = d.data();
                 list.innerHTML += `
                     <div class="post-card">
-                        <div class="post-header">
-                            <div class="user-avatar-text">${p.username[0]}</div>
-                            ${p.username}
-                        </div>
-                        <div class="post-content">${p.text}</div>
+                        <div class="user-row"><div class="avatar-txt">${p.username[0]}</div><strong>${p.username}</strong></div>
+                        <div class="post-body">${p.text}</div>
                     </div>`;
             });
         });
     }
 
-    window.submitPost = async () => {
-        const text = document.getElementById('post-text').value;
-        if(!text) return;
-        await addDoc(collection(db, "posts"), { 
-            uid: currentUser.uid, username: currentUser.displayName, 
-            text, timestamp: Date.now() 
-        });
+    window.savePost = async () => {
+        const t = document.getElementById('post-text').value;
+        if(!t) return;
+        await addDoc(collection(db, "posts"), { uid: currentUser.uid, username: currentUser.displayName, text: t, timestamp: Date.now() });
         document.getElementById('post-text').value = "";
         closeModal('post-modal');
     };
 
-    // --- USUÁRIOS E PERFIS ---
-    async function loadAllUsers() {
+    function loadNotes() {
+        onSnapshot(collection(db, "notes"), (snap) => {
+            const list = document.getElementById('notes-list');
+            list.innerHTML = `<div class="note-circle" onclick="openModal('note-modal')"><div class="note-bubble" style="background:var(--border)">+ Nota</div><span style="font-size:0.7rem">Você</span></div>`;
+            snap.forEach(d => {
+                const n = d.data();
+                if(n.uid === currentUser.uid) return;
+                list.innerHTML += `
+                    <div class="note-circle" onclick="openChat('${n.uid}', '${n.username}')">
+                        <div class="note-bubble">${n.text}</div>
+                        <span style="font-size:0.7rem">${n.username}</span>
+                    </div>`;
+            });
+        });
+    }
+
+    window.saveNote = async () => {
+        const t = document.getElementById('note-text').value;
+        if(!t) return;
+        await setDoc(doc(db, "notes", currentUser.uid), { uid: currentUser.uid, username: currentUser.displayName, text: t });
+        closeModal('note-modal');
+    };
+
+    // --- USERS & MESSAGES ---
+    async function loadUsers() {
         const snap = await getDocs(collection(db, "users"));
-        const list = document.getElementById('global-users-list');
+        const list = document.getElementById('users-list');
         list.innerHTML = "";
         snap.forEach(d => {
             const u = d.data();
             if(u.uid === currentUser.uid) return;
             const item = document.createElement('div');
             item.className = 'list-item';
-            item.innerHTML = `<div class="user-avatar-text">${u.username[0]}</div><div><strong>${u.username}</strong><br><small>${u.bio}</small></div>`;
-            item.onclick = () => showUserProfile(u);
+            item.innerHTML = `<div class="avatar-txt">${u.username[0]}</div><div><strong>${u.username}</strong><br><small style="color:var(--text-dim)">${u.bio}</small></div>`;
+            item.onclick = () => openChat(u.uid, u.username);
             list.appendChild(item);
         });
     }
 
-    window.showUserProfile = (user) => {
-        const overlay = document.getElementById('user-profile-view');
-        document.getElementById('view-username').innerText = user.username;
-        document.getElementById('view-bio').innerText = user.bio;
-        document.getElementById('view-avatar').innerText = user.username[0];
-        document.getElementById('start-chat-btn').onclick = () => {
-            closeOverlay('user-profile-view');
-            openChat(user.uid, user.username);
-        };
-        overlay.classList.add('active');
-    };
-
-    // --- CHAT ---
-    window.openChat = (otherUid, otherName) => {
-        activeChatId = [currentUser.uid, otherUid].sort().join("_");
-        document.getElementById('chat-target-name').innerText = otherName;
-        document.getElementById('chat-window').classList.add('active');
+    window.openChat = (uid, name) => {
+        activeChatId = [currentUser.uid, uid].sort().join("_");
+        document.getElementById('chat-user-name').innerText = name;
+        document.getElementById('chat-overlay').classList.add('active');
         
         onSnapshot(query(collection(db, "chats", activeChatId, "messages"), orderBy("timestamp", "asc")), (snap) => {
-            const cont = document.getElementById('chat-messages');
+            const cont = document.getElementById('chat-msgs');
             cont.innerHTML = "";
             snap.forEach(m => {
                 const msg = m.data();
-                const isMine = msg.sender === currentUser.uid;
-                const div = document.createElement('div');
-                div.style = `padding:10px 15px; border-radius:15px; max-width:80%; ${isMine ? 'align-self:flex-end; background:var(--primary); color:white;' : 'align-self:flex-start; background:#e2e8f0;'}`;
-                div.innerText = msg.text;
-                cont.appendChild(div);
+                const mine = msg.sender === currentUser.uid;
+                cont.innerHTML += `<div class="msg ${mine ? 'sent' : 'received'}">${msg.text}</div>`;
             });
             cont.scrollTop = cont.scrollHeight;
         });
     };
 
-    window.sendChatMessage = async () => {
-        const text = document.getElementById('chat-input').value;
-        if(!text) return;
-        await addDoc(collection(db, "chats", activeChatId, "messages"), { sender: currentUser.uid, text, timestamp: Date.now() });
-        // Metadata para a Inbox
+    window.sendMsg = async () => {
+        const t = document.getElementById('chat-in').value;
+        if(!t) return;
+        document.getElementById('chat-in').value = "";
+        await addDoc(collection(db, "chats", activeChatId, "messages"), { sender: currentUser.uid, text: t, timestamp: Date.now() });
         await setDoc(doc(db, "inbox", activeChatId), {
             participants: activeChatId.split("_"),
-            lastText: text,
-            names: [currentUser.displayName, document.getElementById('chat-target-name').innerText],
-            timestamp: Date.now()
+            last: t,
+            names: [currentUser.displayName, document.getElementById('chat-user-name').innerText],
+            ts: Date.now()
         });
-        document.getElementById('chat-input').value = "";
     };
 
     function loadInbox() {
-        onSnapshot(query(collection(db, "inbox"), where("participants", "array-contains", currentUser.uid)), (snap) => {
-            const list = document.getElementById('chat-inbox-list');
+        onSnapshot(query(collection(db, "inbox"), where("participants", "array-contains", currentUser.uid), orderBy("ts", "desc")), (snap) => {
+            const list = document.getElementById('inbox-list');
             list.innerHTML = "";
             snap.forEach(d => {
                 const data = d.data();
-                const otherName = data.names.find(n => n !== currentUser.displayName);
+                const other = data.names.find(n => n !== currentUser.displayName);
                 const otherUid = data.participants.find(id => id !== currentUser.uid);
-                const div = document.createElement('div');
-                div.className = 'list-item';
-                div.innerHTML = `<div class="user-avatar-text">${otherName[0]}</div><div><strong>${otherName}</strong><br><small>${data.lastText}</small></div>`;
-                div.onclick = () => openChat(otherUid, otherName);
-                list.appendChild(div);
+                const item = document.createElement('div');
+                item.className = 'list-item';
+                item.innerHTML = `<div class="avatar-txt" style="background:var(--surface); border:1px solid var(--border);">${other[0]}</div><div><strong>${other}</strong><br><small style="color:var(--primary)">${data.last}</small></div>`;
+                item.onclick = () => openChat(otherUid, other);
+                list.appendChild(item);
             });
         });
     }
 
-    // --- NOTAS ---
-    function loadNotes() {
-        onSnapshot(collection(db, "notes"), (snap) => {
-            const cont = document.getElementById('notes-container');
-            cont.innerHTML = `<div class="note-item" onclick="openNoteModal()"><div class="note-text-bubble" style="background:#eee;">+ Nota</div><span>Você</span></div>`;
-            snap.forEach(d => {
-                const n = d.data();
-                if(n.uid === currentUser.uid) return;
-                cont.innerHTML += `<div class="note-item"><div class="note-text-bubble">${n.text}</div><span>${n.username}</span></div>`;
-            });
-        });
-    }
-
-    window.submitNote = async () => {
-        const text = document.getElementById('note-text').value;
-        if(!text) return;
-        await setDoc(doc(db, "notes", currentUser.uid), { uid: currentUser.uid, username: currentUser.displayName, text, timestamp: Date.now() });
-        closeModal('note-modal');
-    };
-
-    // Auxiliares UI
-    window.openPostModal = () => document.getElementById('post-modal').classList.remove('hidden');
-    window.openNoteModal = () => document.getElementById('note-modal').classList.remove('hidden');
-    window.closeModal = (id) => document.getElementById(id).classList.add('hidden');
-    window.closeOverlay = (id) => document.getElementById(id).classList.remove('active');
-
-</script>
-</body>
-</html>
-
+    // --- UI HELPERS ---
+    windo
